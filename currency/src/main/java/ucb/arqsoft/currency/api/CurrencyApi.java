@@ -31,6 +31,8 @@ public class CurrencyApi {
         @RequestParam BigDecimal amount
     ) {
         logger.info("GET: Exchange " +  amount + " " + from + " to " + to);
+        logger.info("Starting business logic...");
+        currencyBl.exchange(from, to, amount);
         return ResponseEntity.ok(new ResponseDto<Void>());
     }
 

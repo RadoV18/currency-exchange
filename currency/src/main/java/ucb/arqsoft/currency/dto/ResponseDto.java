@@ -2,7 +2,7 @@ package ucb.arqsoft.currency.dto;
 
 public class ResponseDto<T> {
     private T data; 
-    private boolean succesful;
+    private boolean successful;
     private String message;
 
     public ResponseDto() {
@@ -10,7 +10,7 @@ public class ResponseDto<T> {
 
     public ResponseDto(T data, boolean succesful, String message) {
         this.data = data;
-        this.succesful = succesful;
+        this.successful = succesful;
         this.message = message;
     }
 
@@ -22,12 +22,12 @@ public class ResponseDto<T> {
         this.data = data;
     }
 
-    public boolean isSuccesful() {
-        return succesful;
+    public boolean getSuccessful() {
+        return successful;
     }
 
-    public void setSuccesful(boolean succesful) {
-        this.succesful = succesful;
+    public void setSuccessful(boolean succesful) {
+        this.successful = succesful;
     }
 
     public String getMessage() {
@@ -40,6 +40,6 @@ public class ResponseDto<T> {
 
     @Override
     public String toString() {
-        return "ResponseDto [data=" + data + ", succesful=" + succesful + ", message=" + message + "]";
+        return "ResponseDto [data=" + data + ", succesful=" + successful + ", message=" + message + "]";
     }
 }
