@@ -18,4 +18,12 @@ public class ExceptionController {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(ServiceException.class)
+    public ResponseEntity<ResponseDto<Void>> handleServiceException(ServiceException e) {
+        ResponseDto<Void> response = new ResponseDto<>();
+        response.setSuccessful(false);
+        response.setMessage(e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
 }
