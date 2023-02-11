@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -46,11 +48,15 @@ public class CurrencyBl {
             }
 
             logger.info("Parsing the response");
-            // TODO: parse the response
+            String body = response.body().string();
+
+            // parse the response with jackson
+            ObjectMapper mapper = new ObjectMapper();
+            ExchangeDto exchangeDto = mapper.readValue(body, ExchangeDto.class);
+            return exchangeDto;
         } catch (Exception e) {
+            logger.error("Error while calling the external service", e);
             throw new ServiceException("Error while calling the external service");
         }
-        
-        return new ExchangeDto();
     }
 }
