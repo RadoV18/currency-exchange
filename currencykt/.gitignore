@@ -35,3 +35,6 @@ build/
 
 ### .env ###
 .env
+
+### Ignore logs folder ###
+logs/

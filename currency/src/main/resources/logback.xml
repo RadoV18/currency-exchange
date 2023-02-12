@@ -1,0 +1,34 @@
+<configuration>
+    <property name="LOGS_FOLDER" value="./logs" />
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>${LOGS_FOLDER}/currency.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeAndSizeBasedRollingPolicy">
+            <maxFileSize>2MB</maxFileSize>
+            <fileNamePattern>${LOGS_FOLDER}/currency.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <!-- Show ERROR -->
+    <root level="ERROR">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE" />
+    </root>
+    <!-- Show WARN -->
+    <root level="WARN">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE" />
+    </root>
+    <!--  Show INFO on STDOUT and File  -->
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE" />
+    </root>
+
+</configuration>
