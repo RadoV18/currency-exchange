@@ -20,4 +20,16 @@ class ExceptionHandler {
             HttpStatus.BAD_REQUEST
         );
     }
+
+    @ExceptionHandler(ServiceException::class)
+    fun handleServiceException(e: ServiceException): ResponseEntity<ResponseDto<Any?>> {
+        return ResponseEntity<ResponseDto<Any?>>(
+            ResponseDto<Any?>(
+                data = null,
+                message = e.message ?: "Error calling external service",
+                successful = false
+            ),
+            HttpStatus.SERVICE_UNAVAILABLE
+        );
+    }
 }
