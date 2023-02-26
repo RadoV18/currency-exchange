@@ -9,8 +9,9 @@
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
         <file>${LOGS_FOLDER}/currency.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeAndSizeBasedRollingPolicy">
-        <maxFileSize>2MB</maxFileSize>
-        <fileNamePattern>${LOGS_FOLDER}/currency.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>2MB</maxFileSize>
+            <fileNamePattern>${LOGS_FOLDER}/currency.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+        </rollingPolicy>
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
