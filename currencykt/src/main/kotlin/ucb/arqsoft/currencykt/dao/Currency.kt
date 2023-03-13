@@ -1,10 +1,8 @@
 package ucb.arqsoft.currencykt.dao
 
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.Id
-import jakarta.persistence.Table
+import jakarta.persistence.*
 import java.math.BigDecimal
+import java.sql.Timestamp
 
 @Entity
 @Table(name = "currency")
@@ -13,9 +11,11 @@ class Currency (
     var currencyTo: String,
     var amount: BigDecimal,
     var result: BigDecimal,
+    @Temporal(TemporalType.TIMESTAMP)
+    var requestDate: Timestamp,
     @Id
     @GeneratedValue
     var id: Long = 0
 ) {
-    constructor() : this("", "", BigDecimal.ZERO, BigDecimal.ZERO)
+    constructor() : this("", "", BigDecimal.ZERO, BigDecimal.ZERO, Timestamp(System.currentTimeMillis()))
 }

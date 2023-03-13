@@ -1,0 +1,4 @@
+GET http://localhost:8081/api/v1/currency?from=bob&to=usd&amount=100
+
+###
+GET http://localhost:8081/api/v1/currency/all?limit=10&offset=0

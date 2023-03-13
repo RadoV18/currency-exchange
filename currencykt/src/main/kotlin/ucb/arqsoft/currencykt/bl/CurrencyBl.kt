@@ -10,9 +10,15 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import ucb.arqsoft.currencykt.dao.Currency
 import ucb.arqsoft.currencykt.dao.repository.CurrencyRepository
+import ucb.arqsoft.currencykt.dto.QueryDto
+import ucb.arqsoft.currencykt.dto.InfoDto
 import ucb.arqsoft.currencykt.dto.ExchangeDto
+import ucb.arqsoft.currencykt.dto.PaginatedDto
 import ucb.arqsoft.currencykt.exception.ServiceException
 import java.math.BigDecimal
+import java.sql.Timestamp
+import java.util.*
+
 @Service
 class CurrencyBl {
 
@@ -33,8 +39,8 @@ class CurrencyBl {
         val request: Request = Request.Builder()
             .url(
                 "https://api.apilayer.com/exchangerates_data/convert?" +
+                        "to=$to" +
                         "&from=$from" +
-                        "&to=$to" +
                         "&amount=$amount"
             )
             .addHeader("apikey", apiKey)
@@ -45,27 +51,91 @@ class CurrencyBl {
             val response = client.newCall(request).execute();
 
             if(!response.isSuccessful) {
+                logger.info("Unsuccessful response from external service");
                 throw Exception("Error calling external service");
             }
 
             logger.info("Parsing response");
             val body = response.body?.string();
-
             val objectMapper = jacksonObjectMapper();
-            val dto = objectMapper.readValue(body, ExchangeDto::class.java)
+            val dto = objectMapper.readValue(body, ExchangeDto::class.java);
+            // change timestamp to milliseconds
+            dto.info.timestamp *= 1000;
+
             val currency = Currency(
                 currencyFrom = from,
                 currencyTo = to,
                 amount = amount,
-                result = dto.result
+                result = dto.result,
+                requestDate = Timestamp(dto.info.timestamp)
             )
             logger.info("Saving response in database");
             currencyRepository.save(currency);
             logger.info("Response saved.");
             return dto;
         } catch (e: Exception) {
-            logger.error("Error calling external service");
             throw ServiceException("Error calling external service");
         }
+    }
+
+    fun getExchangeList(
+        limit: Int,
+        offset: Int,
+        query: Map<String, String>
+    ): PaginatedDto<ExchangeDto> {
+        logger.info("Starting business logic");
+        if(limit <= 0 || offset < 0) {
+            logger.error("Invalid limit or offset");
+            throw IllegalArgumentException("Limit must be greater than zero and offset must be greater or equal than zero");
+        }
+        // data validation of query
+        val from: String? = query["from"];
+        val to: String? = query["to"];
+        val sortBy = query["sortBy"];
+        val sortDirection = query["sortDirection"];
+        if(from != null && from.length != 3) {
+            logger.error("Invalid from currency");
+            throw IllegalArgumentException("Invalid from currency");
+        }
+        if(to != null && to.length != 3) {
+            logger.error("Invalid to currency");
+            throw IllegalArgumentException("Invalid to currency");
+        }
+        if(sortBy != null && sortBy != "amount" && sortBy != "result" && sortBy != "requestDate") {
+            logger.error("Invalid sortBy");
+            throw IllegalArgumentException("Invalid sortBy");
+        }
+        if(sortDirection != null && sortDirection != "asc" && sortDirection != "desc") {
+            logger.error("Invalid sortDirection");
+            throw IllegalArgumentException("Invalid sortDirection");
+        }
+        // check if there are query parameters
+        var hasQueryParameters = false;
+        if(query.size > 2) {
+            hasQueryParameters = true;
+        }
+        logger.info("Getting data from database");
+        val exchangeList = currencyRepository
+            .findAllWithLimitAndOffset(limit, offset, from, to, sortBy, sortDirection);
+        val exchangeDtoList = exchangeList.map {
+            ExchangeDto(
+                query = QueryDto(
+                    from = it.currencyFrom,
+                    to = it.currencyTo,
+                    amount = it.amount
+                ),
+                info = InfoDto(
+                    timestamp = it.requestDate.time
+                ),
+                result = it.result
+            )
+        }
+        val total = if(hasQueryParameters) exchangeList.size.toLong() else currencyRepository.count();
+        return PaginatedDto(
+            data = exchangeDtoList,
+            total = total,
+            limit = limit,
+            offset = offset
+        )
     }
 }

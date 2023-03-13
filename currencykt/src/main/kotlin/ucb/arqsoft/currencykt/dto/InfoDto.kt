@@ -1,9 +1,10 @@
 package ucb.arqsoft.currencykt.dto
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.math.BigDecimal
 import java.math.BigInteger
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class InfoDto (
-    val timestamp: BigInteger,
-    val rate: BigDecimal
+        var timestamp: Long
 )
